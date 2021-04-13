@@ -1,0 +1,25 @@
+/channel-artifacts/*.tx
+/channel-artifacts/*.block
+/ledgers
+/ledgers-backup
+/channel-artifacts/*.json
+organizations/ordererOrganizations/*
+organizations/peerOrganizations/*
+system-genesis-block/*
+*.tar.gz
+log.txt
+/bin
+/config
+testscript.sh
+
+# ignore all generated files except ca settings
+organizations/fabric-ca/*
+!organizations/fabric-ca/ordereOrg/fabric-ca-server-config.yaml
+!organizations/fabric-ca/supp1/fabric-ca-server-config.yaml
+!organizations/fabric-ca/courier/fabric-ca-server-config.yaml
+!organizations/fabric-ca/cust1/fabric-ca-server-config.yaml
+!organizations/fabric-ca/cust2/fabric-ca-server-config.yaml
+!organizations/fabric-ca/cust3/fabric-ca-server-config.yaml
+!organizations/fabric-ca/cust4/fabric-ca-server-config.yaml
+!organizations/fabric-ca/cust5/fabric-ca-server-config.yaml
+!organizations/fabric-ca/registerEnroll.sh

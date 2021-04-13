@@ -1,0 +1,519 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+################################################################################
+#
+#   Section: Organizations
+#
+#   - This section defines the different organizational identities which will
+#   be referenced later in the configuration.
+#
+################################################################################
+Organizations:
+
+    # SampleOrg defines an MSP using the sampleconfig.  It should never be used
+    # in production but may be used as a template for other definitions
+    - &OrdererOrg
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: OrdererOrg
+
+        # ID to load the MSP definition as
+        ID: OrdererMSP
+
+        # MSPDir is the filesystem path which contains the MSP configuration
+        MSPDir: ../organizations/ordererOrganizations/csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+        OrdererEndpoints:
+            - orderer.csbn.net:10150
+
+    - &Courier
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: CourierMSP
+
+        # ID to load the MSP definition as
+        ID: CourierMSP
+
+        MSPDir: ../organizations/peerOrganizations/courier.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('CourierMSP.admin', 'CourierMSP.peer', 'CourierMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('CourierMSP.admin', 'CourierMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('CourierMSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('CourierMSP.peer')"
+
+    - &Supp1
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Supp1MSP
+
+        # ID to load the MSP definition as
+        ID: Supp1MSP
+
+        MSPDir: ../organizations/peerOrganizations/supp1.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Supp1MSP.admin', 'Supp1MSP.peer', 'Supp1MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Supp1MSP.admin', 'Supp1MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Supp1MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Supp1MSP.peer')"
+
+    - &Supp2
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Supp2MSP
+
+        # ID to load the MSP definition as
+        ID: Supp2MSP
+
+        MSPDir: ../organizations/peerOrganizations/supp2.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Supp2MSP.admin', 'Supp2MSP.peer', 'Supp2MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Supp2MSP.admin', 'Supp2MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Supp2MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Supp2MSP.peer')"
+
+    - &Supp3
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Supp3MSP
+
+        # ID to load the MSP definition as
+        ID: Supp3MSP
+
+        MSPDir: ../organizations/peerOrganizations/supp3.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Supp3MSP.admin', 'Supp3MSP.peer', 'Supp3MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Supp3MSP.admin', 'Supp3MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Supp3MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Supp3MSP.peer')"
+
+    - &Cust1
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Cust1MSP
+
+        # ID to load the MSP definition as
+        ID: Cust1MSP
+
+        MSPDir: ../organizations/peerOrganizations/cust1.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Cust1MSP.admin', 'Cust1MSP.peer', 'Cust1MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Cust1MSP.admin', 'Cust1MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Cust1MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Cust1MSP.peer')"
+            
+    - &Cust2
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Cust2MSP
+
+        # ID to load the MSP definition as
+        ID: Cust2MSP
+
+        MSPDir: ../organizations/peerOrganizations/cust2.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Cust2MSP.admin', 'Cust2MSP.peer', 'Cust2MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Cust2MSP.admin', 'Cust2MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Cust2MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Cust2MSP.peer')"
+
+    - &Cust3
+        # DefaultOrg defines the organization which is used in the sampleconfig
+        # of the fabric.git development environment
+        Name: Cust3MSP
+
+        # ID to load the MSP definition as
+        ID: Cust3MSP
+
+        MSPDir: ../organizations/peerOrganizations/cust3.csbn.net/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Cust3MSP.admin', 'Cust3MSP.peer', 'Cust3MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Cust3MSP.admin', 'Cust3MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Cust3MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Cust3MSP.peer')"
+
+################################################################################
+#
+#   SECTION: Capabilities
+#
+#   - This section defines the capabilities of fabric network. This is a new
+#   concept as of v1.1.0 and should not be utilized in mixed networks with
+#   v1.0.x peers and orderers.  Capabilities define features which must be
+#   present in a fabric binary for that binary to safely participate in the
+#   fabric network.  For instance, if a new MSP type is added, newer binaries
+#   might recognize and validate the signatures from this type, while older
+#   binaries without this support would be unable to validate those
+#   transactions.  This could lead to different versions of the fabric binaries
+#   having different world states.  Instead, defining a capability for a channel
+#   informs those binaries without this capability that they must cease
+#   processing transactions until they have been upgraded.  For v1.0.x if any
+#   capabilities are defined (including a map with all capabilities turned off)
+#   then the v1.0.x peer will deliberately crash.
+#
+################################################################################
+Capabilities:
+    # Channel capabilities apply to both the orderers and the peers and must be
+    # supported by both.
+    # Set the value of the capability to true to require it.
+    Channel: &ChannelCapabilities
+        # V2_0 capability ensures that orderers and peers behave according
+        # to v2.0 channel capabilities. Orderers and peers from
+        # prior releases would behave in an incompatible way, and are therefore
+        # not able to participate in channels at v2.0 capability.
+        # Prior to enabling V2.0 channel capabilities, ensure that all
+        # orderers and peers on a channel are at v2.0.0 or later.
+        V2_0: true
+
+    # Orderer capabilities apply only to the orderers, and may be safely
+    # used with prior release peers.
+    # Set the value of the capability to true to require it.
+    Orderer: &OrdererCapabilities
+        # V2_0 orderer capability ensures that orderers behave according
+        # to v2.0 orderer capabilities. Orderers from
+        # prior releases would behave in an incompatible way, and are therefore
+        # not able to participate in channels at v2.0 orderer capability.
+        # Prior to enabling V2.0 orderer capabilities, ensure that all
+        # orderers on channel are at v2.0.0 or later.
+        V2_0: true
+
+    # Application capabilities apply only to the peer network, and may be safely
+    # used with prior release orderers.
+    # Set the value of the capability to true to require it.
+    Application: &ApplicationCapabilities
+        # V2_0 application capability ensures that peers behave according
+        # to v2.0 application capabilities. Peers from
+        # prior releases would behave in an incompatible way, and are therefore
+        # not able to participate in channels at v2.0 application capability.
+        # Prior to enabling V2.0 application capabilities, ensure that all
+        # peers on channel are at v2.0.0 or later.
+        V2_0: true
+
+################################################################################
+#
+#   SECTION: Application
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for application related parameters
+#
+################################################################################
+Application: &ApplicationDefaults
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the application side of the network
+    Organizations:
+
+    # Policies defines the set of policies at this level of the config tree
+    # For Application policies, their canonical path is
+    #   /Channel/Application/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+################################################################################
+#
+#   SECTION: Orderer
+#
+#   - This section defines the values to encode into a config transaction or
+#   genesis block for orderer related parameters
+#
+################################################################################
+Orderer: &OrdererDefaults
+
+    # Orderer Type: The orderer implementation to start
+    OrdererType: etcdraft
+    
+    # Addresses used to be the list of orderer addresses that clients and peers
+    # could connect to.  However, this does not allow clients to associate orderer
+    # addresses and orderer organizations which can be useful for things such
+    # as TLS validation.  The preferred way to specify orderer addresses is now
+    # to include the OrdererEndpoints item in your org definition
+    Addresses:
+        - orderer.csbn.net:10150
+
+    EtcdRaft:
+        Consenters:
+        - Host: orderer.csbn.net
+          Port: 10150
+          ClientTLSCert: ../organizations/ordererOrganizations/csbn.net/orderers/orderer.csbn.net/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/csbn.net/orderers/orderer.csbn.net/tls/server.crt
+
+    # Batch Timeout: The amount of time to wait before creating a batch
+    BatchTimeout: 2s
+
+    # Batch Size: Controls the number of messages batched into a block
+    BatchSize:
+
+        # Max Message Count: The maximum number of messages to permit in a batch
+        MaxMessageCount: 10
+
+        # Absolute Max Bytes: The absolute maximum number of bytes allowed for
+        # the serialized messages in a batch.
+        AbsoluteMaxBytes: 99 MB
+
+        # Preferred Max Bytes: The preferred maximum number of bytes allowed for
+        # the serialized messages in a batch. A message larger than the preferred
+        # max bytes will result in a batch larger than preferred max bytes.
+        PreferredMaxBytes: 512 KB
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the orderer side of the network
+    Organizations:
+
+    # Policies defines the set of policies at this level of the config tree
+    # For Orderer policies, their canonical path is
+    #   /Channel/Orderer/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        # BlockValidation specifies what signatures must be included in the block
+        # from the orderer for the peer to validate it.
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+################################################################################
+#
+#   CHANNEL
+#
+#   This section defines the values to encode into a config transaction or
+#   genesis block for channel related parameters.
+#
+################################################################################
+Channel: &ChannelDefaults
+    # Policies defines the set of policies at this level of the config tree
+    # For Channel policies, their canonical path is
+    #   /Channel/<PolicyName>
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    # Capabilities describes the channel level capabilities, see the
+    # dedicated Capabilities section elsewhere in this file for a full
+    # description
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+
+    OrgsOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Courier
+                    - *Supp1
+                    # - *Supp2
+                    # - *Supp3
+                    - *Cust1
+                    # - *Cust2
+                    # - *Cust3
+    channel0:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Courier
+                - *Supp1
+                # - *Supp2
+                # - *Supp3
+                - *Cust1
+                # - *Cust2
+                # - *Cust3
+            Capabilities:
+                <<: *ApplicationCapabilities
+    
+    channel1:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Courier
+                - *Supp1
+                - *Cust1
+            Capabilities:
+                <<: *ApplicationCapabilities
+    
+    channel2:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Courier
+                - *Supp2
+                - *Cust2
+            Capabilities:
+                <<: *ApplicationCapabilities
+    
+    channel3:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Courier
+                - *Supp2
+                - *Supp3
+            Capabilities:
+                <<: *ApplicationCapabilities
+    
+    channel4:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Courier
+                - *Supp3
+                - *Cust3
+            Capabilities:
+                <<: *ApplicationCapabilities

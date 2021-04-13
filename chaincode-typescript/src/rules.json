@@ -1,0 +1,55 @@
+{
+    "roles": {
+        "supplier": [
+            "createProduct",
+            "createShip",
+            "readProduct",
+            "readShip",
+            "updateProduct",
+            "updateShip"
+        ],
+        "customer": [
+            "readProduct",
+            "readShip"
+        ],
+        "courier": [
+            "readShip",
+            "updateShipLocation"
+        ]
+    },
+    
+    "channels": {
+        "channel0": {
+            "supp1": "supplier",
+            "supp2": "supplier",
+            "supp3": "supplier",
+            "cust1": "customer",
+            "cust2": "customer",
+            "cust3": "customer"
+        },
+
+        "channel1": {
+            "courier": "courier",
+            "supp1": "supplier",
+            "cust1": "customer"
+        },
+
+        "channel2": {
+            "courier": "courier",
+            "supp2": "supplier",
+            "cust2": "customer"
+        }, 
+
+        "channel3": {
+            "courier": "courier",
+            "supp2": "supplier",
+            "supp3": "customer"
+        }, 
+
+        "channel4": {
+            "courier": "courier",
+            "supp3": "supplier",
+            "cust3": "customer"
+        }
+    }
+}
