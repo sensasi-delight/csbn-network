@@ -152,8 +152,6 @@ function createOrgs() {
       fi
     done
 
-    sleep 3
-
     infoln "Creating courier Identities"
     createPeer courier 20154
 
@@ -162,18 +160,28 @@ function createOrgs() {
     infoln "Creating supp1 Identities"
     createPeer supp1 30154
 
+    sleep 3
+
     infoln "Creating cust1 Identities"
     createPeer cust1 40154
+
+    sleep 3
 
     if [ $CH1 = false ]; then
       infoln "Creating supp2 Identities"
       createPeer supp2 30254
 
+      sleep 3
+
       infoln "Creating cust2 Identities"
       createPeer cust2 40254
       
+      sleep 3
+
       infoln "Creating supp3 Identities"
       createPeer supp3 30354
+
+      sleep 3
 
       infoln "Creating cust3 Identities"
       createPeer cust3 40354
@@ -226,7 +234,13 @@ function createConsortium() {
   # Note: For some unknown reason (at least for now) the block file can't be
   # named orderer.genesis.block or the orderer will fail to launch!
   set -x
-  configtxgen -profile OrgsOrdererGenesis -channelID system-channel -outputBlock ./system-genesis-block/genesis.block
+  
+  if [ $CH1 = true ]; then
+    configtxgen -profile Ch1Genesis -channelID system-channel -outputBlock ./system-genesis-block/genesis.block
+  else
+    configtxgen -profile OrgsOrdererGenesis -channelID system-channel -outputBlock ./system-genesis-block/genesis.block
+  fi
+  
   res=$?
   { set +x; } 2>/dev/null
   if [ $res -ne 0 ]; then
@@ -283,7 +297,7 @@ function createChannel() {
 
 ## Call the script to deploy a chaincode to the channel
 function deployCC() {
-  scripts/deployCC.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CC_SRC_LANGUAGE $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE $CH1
+  scripts/deployCC.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CC_SRC_LANGUAGE $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE $CC_DEPLOY_MODE
 
   if [ $? -ne 0 ]; then
     fatalln "Deploying chaincode failed"
@@ -323,15 +337,17 @@ function networkDown() {
 # Obtain the OS and Architecture string that will be used to select the correct
 # native binaries for your platform, e.g., darwin-amd64 or linux-amd64
 OS_ARCH=$(echo "$(uname -s | tr '[:upper:]' '[:lower:]' | sed 's/mingw64_nt.*/windows/')-$(uname -m | sed 's/x86_64/amd64/g')" | awk '{print tolower($0)}')
-# Using crpto vs CA. default is cryptogen
-CRYPTO="cryptogen"
+# Using crpto vs CA. default is CA
+# CRYPTO="cryptogen"
+CRYPTO="Certificate Authorities"
+
 # timeout duration - the duration the CLI should wait for a response from
 # another container before giving up
 MAX_RETRY=5
 # default for delay between commands
 CLI_DELAY=3
 # channel name defaults to "mychannel"
-CHANNEL_NAME="mychannel"
+CHANNEL_NAME="unset"
 # chaincode name defaults to "NA"
 CC_NAME="NA"
 # chaincode path defaults to "NA"
@@ -367,6 +383,8 @@ CA_IMAGETAG="1.4.9"
 DATABASE="leveldb"
 #
 CH1=false
+
+CC_DEPLOY_MODE="deploy"
 
 # Parse commandline args
 
@@ -462,6 +480,11 @@ while [[ $# -ge 1 ]] ; do
     CHANNEL_NAME="channel1"
     CRYPTO="Certificate Authorities"
     CH1=true
+    CC_DEPLOY_MODE="CH1"
+    shift
+    ;;
+  -initCC )
+    CC_DEPLOY_MODE="init"
     shift
     ;;
   -verbose )

@@ -449,24 +449,39 @@ Profiles:
                 Organizations:
                     - *Courier
                     - *Supp1
-                    # - *Supp2
-                    # - *Supp3
+                    - *Supp2
+                    - *Supp3
                     - *Cust1
-                    # - *Cust2
-                    # - *Cust3
+                    - *Cust2
+                    - *Cust3
+
+    Ch1Genesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *Courier
+                    - *Supp1
+                    - *Cust1
+
     channel0:
         Consortium: SampleConsortium
         <<: *ChannelDefaults
         Application:
             <<: *ApplicationDefaults
             Organizations:
-                - *Courier
                 - *Supp1
-                # - *Supp2
-                # - *Supp3
+                - *Supp2
+                - *Supp3
                 - *Cust1
-                # - *Cust2
-                # - *Cust3
+                - *Cust2
+                - *Cust3
             Capabilities:
                 <<: *ApplicationCapabilities
     

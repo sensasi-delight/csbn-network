@@ -2,54 +2,53 @@
     "roles": {
         "supplier": [
             "createProduct",
-            "createShip",
+            "createShipment",
             "readProduct",
-            "readShip",
+            "readShipment",
             "updateProduct",
-            "updateShip"
+            "updateShipment"
         ],
         "customer": [
-            "readProduct",
-            "readShip"
+            "readShipment"
         ],
         "courier": [
-            "readShip",
-            "updateShipLocation"
+            "readShipment",
+            "updateShipmentLocation"
         ]
     },
     
     "channels": {
         "channel0": {
-            "supp1": "supplier",
-            "supp2": "supplier",
-            "supp3": "supplier",
-            "cust1": "customer",
-            "cust2": "customer",
-            "cust3": "customer"
+            "Supp1MSP": "supplier",
+            "Supp2MSP": "supplier",
+            "Supp3MSP": "supplier",
+            "Cust1MSP": "customer",
+            "Cust2MSP": "customer",
+            "Cust3MSP": "customer"
         },
 
         "channel1": {
-            "courier": "courier",
-            "supp1": "supplier",
-            "cust1": "customer"
+            "CourierMSP": "courier",
+            "Supp1MSP": "supplier",
+            "Cust1MSP": "customer"
         },
 
         "channel2": {
-            "courier": "courier",
-            "supp2": "supplier",
-            "cust2": "customer"
+            "CourierMSP": "courier",
+            "Supp2MSP": "supplier",
+            "Cust2MSP": "customer"
         }, 
 
         "channel3": {
-            "courier": "courier",
-            "supp2": "supplier",
-            "supp3": "customer"
+            "CourierMSP": "courier",
+            "Supp2MSP": "supplier",
+            "Supp3MSP": "customer"
         }, 
 
         "channel4": {
-            "courier": "courier",
-            "supp3": "supplier",
-            "cust3": "customer"
+            "CourierMSP": "courier",
+            "Supp3MSP": "supplier",
+            "Cust3MSP": "customer"
         }
     }
 }

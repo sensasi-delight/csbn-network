@@ -318,3 +318,30 @@ services:
       - 40351:40351
     networks:
       - csbn
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations
+        - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+    depends_on:
+      - peer0.courier.csbn.net
+      - peer0.cust1.csbn.net
+      - peer0.cust2.csbn.net
+      - peer0.cust3.csbn.net
+      - peer0.supp1.csbn.net
+      - peer0.supp2.csbn.net
+      - peer0.supp3.csbn.net
+    networks:
+      - csbn

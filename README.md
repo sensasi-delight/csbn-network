@@ -13,7 +13,7 @@ curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.2.2 1.4.9 -d -s
 ## Usage
 ```bash
  # membangun network serta CA server masing-masing
-./network.sh up -ca
+./network.sh up
 
 # membuat channel dan memassukan org yg terkait di dalamnya
 ./network.sh createChannel -c channel0
@@ -22,7 +22,10 @@ curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.2.2 1.4.9 -d -s
 ./network.sh createChannel -c channel3
 ./network.sh createChannel -c channel4
 
-# deploy chaincode ke masing-masing channel dengan org terkait di dalamnya
+# install chaincode ke semua peer
+./network.sh deployCC -ccn basic -ccp chaincode-typescript -ccl typescript -initCC
+
+# deploy chaincode ke channel
 ./network.sh deployCC -ccn basic -ccp chaincode-typescript -ccl typescript -c channel0
 ./network.sh deployCC -ccn basic -ccp chaincode-typescript -ccl typescript -c channel1
 ./network.sh deployCC -ccn basic -ccp chaincode-typescript -ccl typescript -c channel2

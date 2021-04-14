@@ -64,7 +64,7 @@ services:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
       - FABRIC_CA_SERVER_CA_NAME=ca-supp2
       - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_PORT=30154
+      - FABRIC_CA_SERVER_PORT=30254
     ports:
       - "30254:30254"
     command: sh -c 'fabric-ca-server start -b admin:adminpw -d'

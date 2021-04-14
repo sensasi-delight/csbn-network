@@ -1,6 +1,6 @@
 import {Context, Contract, Info, Returns, Transaction} from 'fabric-contract-api';
 
-// const rules = require("./rules.json");
+import * as rules from "./rules.json";
 
 @Info({title: 'Csbn', description: 'Smart contract for Chicken Slaughterhouse blockchain network'})
 export class CsbnContract extends Contract {
@@ -12,21 +12,21 @@ export class CsbnContract extends Contract {
     }
 
     @Transaction()
-    public async createProduct(ctx: Context, id: string, name: string, ingredients: string, halalCertificate: string, manufacturer: string): Promise<void> {
-        if (this.validate(ctx, 'createProduct')) {
+    public async createProduct(ctx: Context, id: string, name: string, ingredients: string, halalCertificate: string, manufacturer: string, orgName: string): Promise<void> {
+        if (!this.isValid(ctx, 'createProduct')) {
             throw new Error(`Forbidden action`);
-        } else if (await this.isAssetExists(ctx, 'Product', id)) {
+        } else if (await this.isAssetExists(ctx, 'Product', [id, orgName])) {
             throw new Error(`cant add new record: the asset ID: ${id} is exists`);
         } else {
             const product = {
-                ID: id,
-                Name: name,
-                Ingredients: ingredients,
-                HalalCertificate: halalCertificate,
-                Manufacturer: manufacturer
+                id: id,
+                name: name,
+                ingredients: ingredients,
+                halalCertificate: halalCertificate,
+                manufacturer: manufacturer
             };
 
-            const key = this.getKey(ctx, 'Product', id);
+            const key = this.getKey(ctx, 'Product', [id, orgName]);
             const data = Buffer.from(JSON.stringify(product));
 
             await ctx.stub.putState(key, data);
@@ -35,52 +35,52 @@ export class CsbnContract extends Contract {
 
     // returns the product stored in the world state with given id.
     @Transaction(false)
-    private async readProduct(ctx: Context, id: string): Promise<string> {
-        if (this.validate(ctx, 'readProduct')) {
+    public async readProduct(ctx: Context, id: string, orgName: string): Promise<string> {
+        if (!this.isValid(ctx, 'readProduct')) {
             throw new Error(`Forbidden action`);
         }
         
-        return await this.readAsset(ctx, 'Product', id);
+        return await this.readAsset(ctx, 'Product', [id, orgName]);
     }
 
     @Transaction()
-    public async updateProduct(ctx: Context, id: string, name: string, ingredients: string, halalCertificate: string, manufacturer: string): Promise<void> {
-        if (this.validate(ctx, 'updateProduct')) {
+    public async updateProduct(ctx: Context, id: string, name: string, ingredients: string, halalCertificate: string, manufacturer: string, orgName: string): Promise<void> {
+        if (!this.isValid(ctx, 'updateProduct')) {
             throw new Error(`Forbidden action`);
         }
 
-        const assetString = await this.readProduct(ctx, id);
+        const assetString = await this.readProduct(ctx, id, orgName);
         const asset = JSON.parse(assetString);
 
-        asset.Name = name;
-        asset.Ingredients = ingredients;
-        asset.HalalCertificate = halalCertificate;
-        asset.Manufacturer = manufacturer;
+        asset.name = name;
+        asset.ingredients = ingredients;
+        asset.halalCertificate = halalCertificate;
+        asset.manufacturer = manufacturer;
 
-        const key = this.getKey(ctx, 'Product', id);
+        const key = this.getKey(ctx, 'Product', [id, orgName]);
         const data = Buffer.from(JSON.stringify(asset));
 
         await ctx.stub.putState(key, data);
     }
 
     @Transaction()
-    public async createShip(ctx: Context, id: string, products: string, items: string, location: string): Promise<void> {
-        if (this.validate(ctx, 'createShip')) {
+    public async createShipment(ctx: Context, id: string, productsState: string, items: string, location: string): Promise<void> {
+        if (!this.isValid(ctx, 'createShipment')) {
             throw new Error(`Forbidden action`);
         }
 
-        if (await this.isAssetExists(ctx, 'Ship', id)) {
-            throw new Error(`cant add new record: the ship ID: ${id} is exists`);
+        if (await this.isAssetExists(ctx, 'Shipment', [id])) {
+            throw new Error(`cant add new record: the shipment ID: ${id} is exists`);
         } else {
-            const ship = {
-                ID: id,
-                Products: products,
-                Items: items,
-                Location: location
+            const shipment = {
+                id: id,
+                productsState: productsState,
+                items: items,
+                location: location
             };
     
-            const key = this.getKey(ctx, 'Ship', id);
-            const data = Buffer.from(JSON.stringify(ship))
+            const key = this.getKey(ctx, 'Shipment', [id]);
+            const data = Buffer.from(JSON.stringify(shipment))
     
             await ctx.stub.putState(key, data);
         }
@@ -88,45 +88,45 @@ export class CsbnContract extends Contract {
 
     // returns the product stored in the world state with given id.
     @Transaction(false)
-    private async readShip(ctx: Context, id: string): Promise<string> {
-        if (this.validate(ctx, 'readShip')) {
+    public async readShipment(ctx: Context, id: string): Promise<string> {
+        if (!this.isValid(ctx, 'readShipment')) {
             throw new Error(`Forbidden action`);
         }
 
-        return await this.readAsset(ctx, 'Ship', id);
+        return await this.readAsset(ctx, 'Shipment', [id]);
     }
 
     @Transaction()
-    public async updateShip(ctx: Context, id: string, products: string, items: string, location: string): Promise<void> {
-        if (this.validate(ctx, 'updateShip')) {
+    public async updateShipment(ctx: Context, id: string, productsState: string, items: string, location: string): Promise<void> {
+        if (!this.isValid(ctx, 'updateShipment')) {
             throw new Error(`Forbidden action`);
         }
 
-        const assetString = await this.readShip(ctx, id);
+        const assetString = await this.readShipment(ctx, id);
         const asset = JSON.parse(assetString);
         
-        asset.Products = products;
-        asset.Items = items;
-        asset.Location = location;
+        asset.productsState = productsState;
+        asset.items = items;
+        asset.location = location;
 
-        const key = this.getKey(ctx, 'Ship', id);
+        const key = this.getKey(ctx, 'Shipment', [id]);
         const data = Buffer.from(JSON.stringify(asset));
         
         await ctx.stub.putState(key, data);
     }
 
     @Transaction()
-    public async updateShipLocation(ctx: Context, id: string, location: string): Promise<void> {
-        if (this.validate(ctx, 'updateShipLocation')) {
+    public async updateShipmentLocation(ctx: Context, id: string, location: string): Promise<void> {
+        if (!this.isValid(ctx, 'updateShipmentLocation')) {
             throw new Error(`Forbidden action`);
         }
 
-        const assetString = await this.readShip(ctx, id);
+        const assetString = await this.readShipment(ctx, id);
         const asset = JSON.parse(assetString);
 
-        asset.Location = location;
+        asset.location = location;
 
-        const key = this.getKey(ctx, 'Ship', id);
+        const key = this.getKey(ctx, 'Shipment', [id]);
         const data = Buffer.from(JSON.stringify(asset));
         
         await ctx.stub.putState(key, data);
@@ -134,11 +134,11 @@ export class CsbnContract extends Contract {
 
     // ReadAsset returns the asset stored in the world state with given id.
     @Transaction(false)
-    private async readAsset(ctx: Context, type: string, id: string): Promise<string> {
-        const ledgerKey = this.getKey(ctx, type, id);
+    private async readAsset(ctx: Context, type: string, attributes: string[]): Promise<string> {
+        const ledgerKey = this.getKey(ctx, type, attributes);
         const assetJSON = await ctx.stub.getState(ledgerKey); // get the asset from chaincode state
         if (!assetJSON || assetJSON.length === 0) {
-            throw new Error(`The ${type} asset ${id} does not exist`);
+            throw new Error(`The ${type} asset ${attributes[0]} does not exist`);
         }
         return assetJSON.toString();
     }
@@ -147,85 +147,42 @@ export class CsbnContract extends Contract {
     // AssetExists returns true when asset with given ID exists in world state.
     @Transaction(false)
     @Returns('boolean')
-    public async isAssetExists(ctx: Context, type: string, id: string): Promise<boolean> {
-        const key = this.getKey(ctx, type, id);
+    private async isAssetExists(ctx: Context, type: string, attributes: string[]): Promise<boolean> {
+        const key = this.getKey(ctx, type, attributes);
         const assetJSON = await ctx.stub.getState(key);
         return assetJSON && assetJSON.length > 0;
     }
-    
-    // GetAllAssets returns all assets found in the world state.
+
     @Transaction(false)
     @Returns('string')
-    public async getAllAssets(ctx: Context, type: string, attrs: string): Promise<string> {
-        const allResults = [];
+    private getKey(ctx: Context, type: string, attributes: string[]) {
+        return ctx.stub.createCompositeKey(type, attributes);
+    }
 
-        // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
-        // const iterator = await ctx.stub.getStateByRange(startKey, endKey);
-        const iterator = await ctx.stub.getStateByPartialCompositeKey(type, JSON.parse(attrs));
+    @Transaction(false)
+    private isValid(ctx: Context, functionName: string) {
+        const channelName = ctx.stub.getChannelID();
 
-        let result = await iterator.next();
-        while (!result.done) {
-            const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-            let record;
-            try {
-                record = JSON.parse(strValue);
-            } catch (err) {
-                console.log(err);
-                record = strValue;
-            }
-            allResults.push({Key: result.value.key, Record: record});
-            result = await iterator.next();
+        const channel0FunctionOnly = [
+            "createProduct",
+            "updateProduct",
+            "readProduct"
+        ];
+
+        if (channelName == "channel0" && !channel0FunctionOnly.includes(functionName)) {
+            return false;
         }
-        return JSON.stringify(allResults);
-    }
 
-    // GetAllAssets returns all assets found in the world state.
-    // @Transaction(false)
-    // @Returns('string')
-    // public async readAssetHistory(ctx: Context, type: string, id: string): Promise<string> {
-    //     const allResults = [];
+        if (channelName != "channel0" && channel0FunctionOnly.includes(functionName)) {
+            return false;
+        }
 
-    //     // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
-    //     // const iterator = await ctx.stub.getStateByRange(startKey, endKey);
-    //     const key = this.getKey(ctx, 'Ship', id);
-    //     const iterator = await ctx.stub.getHistoryForKey(key);
+        ctx.clientIdentity.getMSPID();
 
-    //     let result = await iterator.next();
-    //     while (!result.done) {
-    //         const strValue = Buffer.from(result.value.value.toString()).toString('utf8');
-    //         let record;
-    //         try {
-    //             record = JSON.parse(strValue);
-    //         } catch (err) {
-    //             console.log(err);
-    //             record = strValue;
-    //         }
-    //         allResults.push({Key: result.value.key, Record: record});
-    //         result = await iterator.next();
-    //     }
-    //     return JSON.stringify(allResults);
-    // }
+        const MSPID = ctx.clientIdentity.getMSPID();
 
-    @Transaction(false)
-    @Returns('string')
-    private getKey(ctx: Context, type: string, id: string) {
-        return ctx.stub.createCompositeKey(type, [id]);
-        //return type + id;
-    }
+        const role = rules.channels[channelName][MSPID];
 
-    @Transaction(false)
-    private validate(ctx: Context, functionName: string) {
-        // const channelName = ctx.stub.getChannelID();
-
-        // if (channelName != "channel0" && functionName == "createProduct") {
-        //     return false;
-        // }
-
-        // const orgName = ctx.clientIdentity.getAttributeValue('orgName');
-
-        // const role = rules[channelName][orgName];
-
-        // return rules.roles[role].includes(functionName);
-        return true;
+        return rules.roles[role].includes(functionName);
     }
 }

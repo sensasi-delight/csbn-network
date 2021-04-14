@@ -70,7 +70,7 @@ setAnchorPeer() {
 }
 
 if [ "${CHANNEL_NAME}" == "channel0" ]; then
-	ORGS=("courier" "supp1" "supp2" "supp3" "cust1" "cust2" "cust3")
+	ORGS=("supp1" "supp2" "supp3" "cust1" "cust2" "cust3")
 elif [ "${CHANNEL_NAME}" == "channel1" ]; then
 	ORGS=("courier" "supp1" "cust1")
 elif [ "${CHANNEL_NAME}" == "channel2" ]; then
@@ -96,7 +96,7 @@ BLOCKFILE="./channel-artifacts/${CHANNEL_NAME}.block"
 
 ## Create channel
 infoln "Creating channel ${CHANNEL_NAME}"
-createChannel "courier"
+createChannel ${ORGS[0]}
 successln "Channel '$CHANNEL_NAME' created"
 
 for ORG in ${ORGS[@]}

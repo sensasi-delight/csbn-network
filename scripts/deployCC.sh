@@ -2,7 +2,7 @@
 
 source scripts/utils.sh
 
-CHANNEL_NAME=${1:-"mychannel"}
+CHANNEL_NAME=${1}
 CC_NAME=${2}
 CC_SRC_PATH=${3}
 CC_SRC_LANGUAGE=${4}
@@ -14,7 +14,7 @@ CC_COLL_CONFIG=${9:-"NA"}
 DELAY=${10:-"3"}
 MAX_RETRY=${11:-"5"}
 VERBOSE=${12:-"false"}
-CH1=${13:-"false"}
+MODE=${13}
 
 
 println "executing with the following"
@@ -48,46 +48,6 @@ elif [ -z "$CC_SRC_LANGUAGE" ] || [ "$CC_SRC_LANGUAGE" = "NA" ]; then
 ## Make sure that the path to the chaincode exists
 elif [ ! -d "$CC_SRC_PATH" ]; then
   fatalln "Path to chaincode does not exist. Please provide different path."
-fi
-
-CC_SRC_LANGUAGE=$(echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:])
-
-# do some language specific preparation to the chaincode before packaging
-if [ "$CC_SRC_LANGUAGE" = "go" ]; then
-  CC_RUNTIME_LANGUAGE=golang
-
-  infoln "Vendoring Go dependencies at $CC_SRC_PATH"
-  pushd $CC_SRC_PATH
-  GO111MODULE=on go mod vendor
-  popd
-  successln "Finished vendoring Go dependencies"
-
-elif [ "$CC_SRC_LANGUAGE" = "java" ]; then
-  CC_RUNTIME_LANGUAGE=java
-
-  infoln "Compiling Java code..."
-  pushd $CC_SRC_PATH
-  ./gradlew installDist
-  popd
-  successln "Finished compiling Java code"
-  CC_SRC_PATH=$CC_SRC_PATH/build/install/$CC_NAME
-
-elif [ "$CC_SRC_LANGUAGE" = "javascript" ]; then
-  CC_RUNTIME_LANGUAGE=node
-
-elif [ "$CC_SRC_LANGUAGE" = "typescript" ]; then
-  CC_RUNTIME_LANGUAGE=node
-
-  infoln "Compiling TypeScript code into JavaScript..."
-  pushd $CC_SRC_PATH
-  npm install
-  npm run build
-  popd
-  successln "Finished compiling TypeScript code into JavaScript"
-
-else
-  fatalln "The chaincode language ${CC_SRC_LANGUAGE} is not supported by this script. Supported chaincode languages are: go, java, javascript, and typescript"
-  exit 1
 fi
 
 INIT_REQUIRED="--init-required"
@@ -284,8 +244,97 @@ chaincodeQuery() {
   fi
 }
 
-if [ "${CHANNEL_NAME}" == "channel0" ]; then
-	ORGS=("courier" "supp1" "supp2" "supp3" "cust1" "cust2" "cust3")
+init() {
+  local ORGS=("$@")
+  
+  CC_SRC_LANGUAGE=$(echo "$CC_SRC_LANGUAGE" | tr [:upper:] [:lower:])
+
+  # do some language specific preparation to the chaincode before packaging
+  if [ "$CC_SRC_LANGUAGE" = "go" ]; then
+    CC_RUNTIME_LANGUAGE=golang
+
+    infoln "Vendoring Go dependencies at $CC_SRC_PATH"
+    pushd $CC_SRC_PATH
+    GO111MODULE=on go mod vendor
+    popd
+    successln "Finished vendoring Go dependencies"
+
+  elif [ "$CC_SRC_LANGUAGE" = "java" ]; then
+    CC_RUNTIME_LANGUAGE=java
+
+    infoln "Compiling Java code..."
+    pushd $CC_SRC_PATH
+    ./gradlew installDist
+    popd
+    successln "Finished compiling Java code"
+    CC_SRC_PATH=$CC_SRC_PATH/build/install/$CC_NAME
+
+  elif [ "$CC_SRC_LANGUAGE" = "javascript" ]; then
+    CC_RUNTIME_LANGUAGE=node
+
+  elif [ "$CC_SRC_LANGUAGE" = "typescript" ]; then
+    
+    CC_RUNTIME_LANGUAGE=node
+
+    infoln "Compiling TypeScript code into JavaScript..."
+    pushd $CC_SRC_PATH
+    npm install
+    npm run build
+    popd
+    successln "Finished compiling TypeScript code into JavaScript"
+
+  else
+    fatalln "The chaincode language ${CC_SRC_LANGUAGE} is not supported by this script. Supported chaincode languages are: go, java, javascript, and typescript"
+    exit 1
+  fi
+
+  ## package the chaincode
+  packageChaincode
+
+  for ORG in ${ORGS[@]}
+  do
+    installChaincode $ORG
+  done
+}
+
+deploy() {
+  local ORGS=("$@")
+
+  for ORG_I in ${ORGS[@]}
+  do
+    ## query whether the chaincode is installed
+    queryInstalled $ORG_I
+    
+    ## approve the definition for org
+    approveForMyOrg $ORG_I
+
+    for ORG_J in ${ORGS[@]}
+    do
+      checkCommitReadiness $ORG_J
+    done
+  done
+
+  commitChaincodeDefinition ${ORGS[@]}
+
+  for ORG in ${ORGS[@]}
+  do
+    queryCommitted $ORG
+  done
+
+  ## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
+  ## method defined
+  if [ "$CC_INIT_FCN" = "NA" ]; then
+    infoln "Chaincode initialization is not required"
+  else
+    chaincodeInvokeInit ${ORGS[@]}
+  fi
+}
+
+#------------- MAIN --------------
+if [ "$MODE" == "init" ]; then
+  ORGS=("courier" "supp1" "supp2" "supp3" "cust1" "cust2" "cust3")
+elif [ "${CHANNEL_NAME}" == "channel0" ]; then
+	ORGS=("supp1" "supp2" "supp3" "cust1" "cust2" "cust3")
 elif [ "${CHANNEL_NAME}" == "channel1" ]; then
 	ORGS=("courier" "supp1" "cust1")
 elif [ "${CHANNEL_NAME}" == "channel2" ]; then
@@ -298,43 +347,13 @@ else
 	fatalln "CHANNEL Unknown"
 fi
 
-if [ "${CHANNEL_NAME}" == "channel0" ] || [ $CH1 = true ]; then
-  ## package the chaincode
-  packageChaincode
-
-	for ORG in ${ORGS[@]}
-	do
-		installChaincode $ORG
-	done
-fi
-
-## query whether the chaincode is installed
-queryInstalled "courier"
-
-for ORG_I in ${ORGS[@]}
-do
-  ## approve the definition for org
-  approveForMyOrg $ORG_I
-
-  for ORG_J in ${ORGS[@]}
-  do
-    checkCommitReadiness $ORG_J
-  done
-done
-
-commitChaincodeDefinition ${ORGS[@]}
-
-for ORG in ${ORGS[@]}
-do
-  queryCommitted $ORG
-done
-
-## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
-## method defined
-if [ "$CC_INIT_FCN" = "NA" ]; then
-  infoln "Chaincode initialization is not required"
+if [ "$MODE" == "CH1" ]; then
+  init "${ORGS[@]}"
+  deploy "${ORGS[@]}"
+elif [ "$MODE" == "init" ]; then
+  init "${ORGS[@]}"
 else
-  chaincodeInvokeInit ${ORGS[@]}
+  deploy "${ORGS[@]}"
 fi
 
 exit 0
