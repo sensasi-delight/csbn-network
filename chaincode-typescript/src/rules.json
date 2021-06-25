@@ -2,18 +2,27 @@
     "roles": {
         "supplier": [
             "createProduct",
-            "createShipment",
             "readProduct",
-            "readShipment",
             "updateProduct",
-            "updateShipment"
+
+            "createBatch",
+            "readBatch",
+            "updateBatch",
+            
+            "createInvoice",
+            "readInvoice",
+            "updateInvoice"
         ],
         "customer": [
+            "readProduct",
+            "readBatch",
+            "readInvoice",
             "readShipment"
         ],
         "courier": [
+            "createShipment",
             "readShipment",
-            "updateShipmentLocation"
+            "updateShipment"
         ]
     },
     
