@@ -11,9 +11,14 @@
             
             "createInvoice",
             "readInvoice",
-            "updateInvoice"
+            "updateInvoice",
+            
+            "createSlaughterer",
+            "readSlaughterer",
+            "updateSlaughterer"
         ],
         "customer": [
+            "readSlaughterer",
             "readProduct",
             "readBatch",
             "readInvoice",

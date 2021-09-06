@@ -44,7 +44,7 @@ export class CsbnContract extends Contract {
     	this.isInvalid(ctx, 'read' + type);
 
         const keys = JSON.parse(keysJson);
-        
+
         const ledgerKey = this.getKey(ctx, type, keys);
         const assetJSON = await ctx.stub.getState(ledgerKey);
 
@@ -61,12 +61,13 @@ export class CsbnContract extends Contract {
     @Returns('string')
     public async readAssets(ctx: Context, type: string, keysJson: string): Promise<string> {
 
+    	this.isInvalid(ctx, 'read' + type);
+
         const allResults = [];
         const keys = JSON.parse(keysJson);
-
-        // range query with empty string for startKey and endKey does an open-ended query of all assets in the chaincode namespace.
-        // const iterator = await ctx.stub.getStateByRange(startKey, endKey);
-        const iterator = await ctx.stub.getStateByPartialCompositeKey(type, keys);
+		
+		// const iterator = await ctx.stub.getStateByRange(topKey, bottomKey); composite key can't getStateByRange
+		const iterator = await ctx.stub.getStateByPartialCompositeKey(type, keys);
 
         let result = await iterator.next();
         while (!result.done) {
@@ -137,7 +138,11 @@ export class CsbnContract extends Contract {
 
             "createBatch",
             "updateBatch",
-            "readBatch"
+            "readBatch",
+
+			"createSlaughterer",
+            "readSlaughterer",
+            "updateSlaughterer"
         ];
 
         if (channelName == "channel0" && !channel0FunctionOnly.includes(functionName)) {
