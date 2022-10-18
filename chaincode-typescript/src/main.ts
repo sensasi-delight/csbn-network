@@ -104,6 +104,34 @@ export class CsbnContract extends Contract {
   }
 
 
+  @Transaction(false)
+  @Returns('string')
+  public async getAssetHistory(ctx: Context, type: string, keysJsonStr: string): Promise<string> {
+
+    const keys: Array<string> = JSON.parse(keysJsonStr);
+
+    const ledgerKey: string = this.getKey(ctx, type, keys);
+
+    const promiseOfIterator = ctx.stub.getHistoryForKey(ledgerKey);
+
+    const results: Array<Object> = [];
+    
+    for await (const keyMod of promiseOfIterator) {
+      const resp: any = {};
+
+      resp.timestamp = keyMod.timestamp;
+      resp.txId = keyMod.txId;
+      resp.isDelete = keyMod.isDelete;
+
+      if (!keyMod.isDelete) {
+        resp.data = keyMod.value.toString('utf8');
+      }
+
+      results.push(resp);
+    }
+
+    return JSON.stringify(results);
+  }
 
 
 
@@ -120,7 +148,7 @@ export class CsbnContract extends Contract {
 
   @Transaction(false)
   @Returns('string')
-  private getKey(ctx: Context, type: string, attributes: string[]) {
+  private getKey(ctx: Context, type: string, attributes: string[]): string {
     return ctx.stub.createCompositeKey(type, attributes);
   }
 
